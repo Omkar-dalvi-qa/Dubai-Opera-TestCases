@@ -1,0 +1,17 @@
+{
+  "customer": {
+    "firstName": "Test",
+    "lastName": "User",
+    "nationality": "India",
+    "email": "test@gmail.com",
+    "mobile": "1234567890",
+    "countryCode": "Afghanistan",
+    "city": "Dubai"
+  },
+  "payment": {
+    "cardNumber": "4000000000002503",
+    "holderName": "Test User",
+    "expiry": "12/2030",
+    "cvv": "123"
+  }
+}
