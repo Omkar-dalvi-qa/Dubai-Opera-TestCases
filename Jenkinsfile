@@ -26,11 +26,14 @@ pipeline {
         }
 
         stage('Run Tests') {
-            steps {
-                sh 'mkdir -p test-results'
-                sh 'npx playwright test || true'
-            }
-        }
+    steps {
+        // Clean old results before running
+        sh 'rm -rf allure-results'
+        sh 'rm -rf allure-report'
+        sh 'mkdir -p test-results'
+        sh 'npx playwright test || true'
+    }
+}
 
         stage('Parse Results') {
             steps {
