@@ -1,0 +1,152 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: bookingFlow.spec.js >> Event Booking - End-to-End Flow >> Verify that user should show sign-in prompt after selecting event date and timeslot
+- Location: tests/bookingFlow.spec.js:21:3
+
+# Error details
+
+```
+Test timeout of 30000ms exceeded.
+```
+
+```
+Error: locator.click: Test timeout of 30000ms exceeded.
+Call log:
+  - waiting for locator('.lucide.lucide-plus').first()
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - region "Notifications alt+T"
+    - navigation [ref=e3]:
+      - link "Logo" [ref=e4] [cursor=pointer]:
+        - /url: /en
+        - img "Logo" [ref=e6]
+      - generic [ref=e7]:
+        - button "Search" [ref=e8] [cursor=pointer]:
+          - img [ref=e9]
+        - link "Cart" [ref=e13] [cursor=pointer]:
+          - /url: /en/shop/cart
+          - img [ref=e14]
+        - button "Sign In" [ref=e18] [cursor=pointer]
+    - main [ref=e19]:
+      - generic [ref=e21]:
+        - generic [ref=e23]:
+          - button "Go back" [ref=e24]:
+            - img [ref=e25]
+          - generic [ref=e27]:
+            - button "Taha Desouky - Stand..." [ref=e29]
+            - generic [ref=e30]:
+              - generic [ref=e31]: /
+              - button "Select Your Seat"
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - heading "Taha Desouky - Stand Up Comedy" [level=1] [ref=e36]
+            - generic [ref=e38]:
+              - generic [ref=e39]:
+                - generic [ref=e40]: Wed 10 Jun, 12:20 PM
+                - paragraph [ref=e41]: Dubai Opera
+              - button "Modify" [ref=e42] [cursor=pointer]
+          - main [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e46]:
+                - generic [ref=e47]:
+                  - button "Zoom in" [ref=e48]:
+                    - img [ref=e49]
+                  - button "Fit to screen" [ref=e52]:
+                    - img [ref=e53]
+                  - button "Zoom out" [ref=e58]:
+                    - img [ref=e59]
+                - img [ref=e63]:
+                  - generic [ref=e64]:
+                    - generic:
+                      - generic: STAGE
+                    - generic:
+                      - generic: STALLS
+                    - generic:
+                      - generic: ROYAL CIRCLE
+                    - generic:
+                      - generic: GRAND CIRCLE
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: GOLD
+                        - generic: Seat P:1
+                      - generic: Selected
+                    - generic:
+                      - generic: Price
+                      - generic: AED1,500
+              - generic [ref=e12279]:
+                - button "Standard" [ref=e12280]:
+                  - generic [ref=e12281]: Standard
+                - button "VIP" [ref=e12283]:
+                  - generic [ref=e12284]: VIP
+                - button "PLATINUM" [ref=e12286]:
+                  - generic [ref=e12287]: PLATINUM
+                - button "GOLD" [ref=e12289]:
+                  - generic [ref=e12290]: GOLD
+                - button "SILVER" [ref=e12292]:
+                  - generic [ref=e12293]: SILVER
+                - button "STALLS PLATINUM" [ref=e12295]:
+                  - generic [ref=e12296]: STALLS PLATINUM
+          - generic [ref=e12300]:
+            - button "Summary" [ref=e12301] [cursor=pointer]:
+              - text: Summary
+              - img [ref=e12302]
+            - generic [ref=e12304]:
+              - generic [ref=e12305]: AED 3500
+              - button "Proceed" [ref=e12306] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e12312] [cursor=pointer]:
+    - img [ref=e12313]
+  - alert [ref=e12316]: Dubai Opera | House of Cultures
+```
+
+# Test source
+
+```ts
+  1  | const { BasePage } = require('./BasePage');
+  2  | 
+  3  | class SelectSetPg extends BasePage {
+  4  |   constructor(page) {
+  5  |     super(page);
+  6  |   }
+  7  | 
+  8  |   seatLocator(type) {
+  9  |     return this.page.locator(
+  10 |       `[data-seat-element="true"][data-seat-type="${type}"][data-seat-status="available"]`
+  11 |     ).first();
+  12 |   }
+  13 | 
+  14 |   async selectSeat(type) {
+  15 |     const seat = this.seatLocator(type);
+  16 |     await seat.waitFor({ state: 'visible', timeout: 10000 });
+  17 |     await seat.dispatchEvent('click');
+  18 |   }
+  19 | 
+  20 |   async selectevent() {
+  21 |     await this.selectSeat('PLATINUM');
+  22 |     await this.selectSeat('GOLD');
+  23 |     //await this.selectSeat('Standard');
+  24 | 
+  25 |     await this.page.getByRole('button', { name: 'Proceed' }).click();
+> 26 |     //await this.page.locator('.lucide.lucide-plus').first().click();
+     |                                                            ^ Error: locator.click: Test timeout of 30000ms exceeded.
+  27 |     await this.page.getByRole('button', { name: 'Proceed to Checkout' }).click();
+  28 |   }
+  29 | }
+  30 | 
+  31 | module.exports = { SelectSetPg };
+  32 | 
+```

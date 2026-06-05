@@ -23,7 +23,7 @@ class SelectSetPg extends BasePage {
     //await this.selectSeat('Standard');
 
     await this.page.getByRole('button', { name: 'Proceed' }).click();
-    await this.page.locator('.lucide.lucide-plus').first().click();
+    //await this.page.locator('.lucide.lucide-plus').first().click();
     await this.page.getByRole('button', { name: 'Proceed to Checkout' }).click();
   }
 }
