@@ -26,37 +26,27 @@ pipeline {
         }
 
         stage('Run Tests') {
-    steps {
-        sh 'mkdir -p test-results'
-        // removed --reporter flag — config file handles all reporters now
-        sh 'npx playwright test || true'
-    }
-}
-        stage('Parse Results') {
-    steps {
-        script {
-            try {
-                // Print the file so we can see its structure
-                sh 'cat test-results/results.json'
-                def results = readJSON file: 'test-results/results.json'
-                echo "Stats: ${results.stats}"
-                env.TEST_PASSED  = results.stats.expected.toString()
-                env.TEST_FAILED  = results.stats.unexpected.toString()
-                env.TEST_SKIPPED = results.stats.skipped.toString()
-                echo "Passed: ${TEST_PASSED}, Failed: ${TEST_FAILED}, Skipped: ${TEST_SKIPPED}"
-            } catch (err) {
-                echo "Could not read results.json: ${err}"
-                env.TEST_PASSED  = 'N/A'
-                env.TEST_FAILED  = 'N/A'
-                env.TEST_SKIPPED = 'N/A'
+            steps {
+                sh 'mkdir -p test-results'
+                sh 'npx playwright test || true'
             }
         }
-    }
-}
 
-        stage('Generate Allure Report') {
+        stage('Parse Results') {
             steps {
-                sh 'npx allure generate allure-results --clean --output allure-report || true'
+                script {
+                    try {
+                        def results = readJSON file: 'test-results/results.json'
+                        env.TEST_PASSED  = results.stats.expected.toString()
+                        env.TEST_FAILED  = results.stats.unexpected.toString()
+                        env.TEST_SKIPPED = results.stats.skipped.toString()
+                    } catch (err) {
+                        echo "Could not read results.json: ${err}"
+                        env.TEST_PASSED  = 'N/A'
+                        env.TEST_FAILED  = 'N/A'
+                        env.TEST_SKIPPED = 'N/A'
+                    }
+                }
             }
         }
 
@@ -64,14 +54,12 @@ pipeline {
 
     post {
         always {
-            // Publish Allure report in Jenkins UI
             allure([
                 includeProperties: false,
                 reportBuildPolicy: 'ALWAYS',
                 results: [[path: 'allure-results']]
             ])
 
-            // Send email
             emailext(
                 to: 'omkardalvi861@gmail.com',
                 subject: "Dubai Opera Tests — Build #${BUILD_NUMBER}: ${currentBuild.currentResult}",
