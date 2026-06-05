@@ -2,7 +2,7 @@ const { test, expect } = require('../utils/fixtures');
 const { takeFullPageScreenshot } = require('../utils/Reuasble');
 
 // ═══════════════════════════════════════════════════════════
-// Event Booking — Full E2E Flow
+// Event Booking — Full E2E Flow Code Chnages
 // ═══════════════════════════════════════════════════════════
 test.describe('Event Booking - End-to-End Flow', () => {
 
