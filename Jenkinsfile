@@ -28,7 +28,8 @@ pipeline {
         stage('Run Tests') {
     steps {
         sh 'mkdir -p test-results'
-        sh 'npx playwright test --reporter=line,allure-playwright || true'
+        // removed --reporter flag — config file handles all reporters now
+        sh 'npx playwright test || true'
     }
 }
         stage('Parse Results') {
