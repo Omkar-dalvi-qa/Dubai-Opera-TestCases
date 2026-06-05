@@ -14,7 +14,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/yourname/dubai-opera-tests.git'
+                    url: 'https://github.com/Omkar-dalvi-qa/Dubai-Opera-TestCases.git'
             }
         }
 
