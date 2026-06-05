@@ -36,7 +36,7 @@ pipeline {
     post {
         always {
             emailext(
-                to: 'omkar.dalvi@enpointe.io',
+                to: 'omkardalvi861@gmail.com',
                 subject: "Dubai Opera Tests — Build #${BUILD_NUMBER}: ${currentBuild.currentResult}",
                 body: """
                     <html><body>
