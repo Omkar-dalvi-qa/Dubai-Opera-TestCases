@@ -64,47 +64,172 @@ pipeline {
             ])
 
             emailext(
-                to: 'omkardalvi861@gmail.com',
-                subject: "Dubai Opera Tests — Build #${BUILD_NUMBER}: ${currentBuild.currentResult}",
-                body: """
-                    <html><body>
-                        <h2>Dubai Opera — Playwright Test Results</h2>
-                        <table border="1" cellpadding="8" style="border-collapse:collapse">
+    to: 'omkardalvi861@gmail.com',
+    subject: "Dubai Opera Tests — Build #${BUILD_NUMBER}: ${currentBuild.currentResult}",
+    body: """
+        <html>
+        <body style="margin:0;padding:0;font-family:Arial,sans-serif;background-color:#f4f4f4;">
+
+            <!-- Header -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#8B0000;">
+                <tr>
+                    <td style="padding:24px 32px;">
+                        <h1 style="margin:0;color:#ffffff;font-size:22px;letter-spacing:1px;">
+                            DUBAI OPERA
+                        </h1>
+                        <p style="margin:4px 0 0;color:#ffcccc;font-size:13px;">
+                            Automated Test Report
+                        </p>
+                    </td>
+                    <td align="right" style="padding:24px 32px;">
+                        <span style="
+                            background-color:${currentBuild.currentResult == 'SUCCESS' ? '#2ecc71' : currentBuild.currentResult == 'UNSTABLE' ? '#f39c12' : '#e74c3c'};
+                            color:#ffffff;
+                            padding:8px 18px;
+                            border-radius:20px;
+                            font-size:13px;
+                            font-weight:bold;
+                            letter-spacing:1px;
+                        ">${currentBuild.currentResult}</span>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Body -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 32px;background-color:#f4f4f4;">
+                <tr>
+                    <td>
+
+                        <!-- Build info -->
+                        <p style="margin:0 0 20px;color:#555555;font-size:14px;">
+                            Build <b>#${BUILD_NUMBER}</b> completed in <b>${currentBuild.durationString}</b>
+                        </p>
+
+                        <!-- Stats cards -->
+                        <table cellpadding="0" cellspacing="0" width="100%">
                             <tr>
-                                <td><b>Build Number</b></td>
-                                <td>#${BUILD_NUMBER}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Status</b></td>
-                                <td style="color:${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'}">
-                                    <b>${currentBuild.currentResult}</b>
+                                <td width="24%" style="padding:4px;">
+                                    <table width="100%" cellpadding="16" style="background:#ffffff;border-radius:8px;border-top:4px solid #2ecc71;">
+                                        <tr>
+                                            <td align="center">
+                                                <p style="margin:0;font-size:32px;font-weight:bold;color:#2ecc71;">${TEST_PASSED}</p>
+                                                <p style="margin:4px 0 0;font-size:12px;color:#888888;text-transform:uppercase;letter-spacing:1px;">Passed</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td width="24%" style="padding:4px;">
+                                    <table width="100%" cellpadding="16" style="background:#ffffff;border-radius:8px;border-top:4px solid #e74c3c;">
+                                        <tr>
+                                            <td align="center">
+                                                <p style="margin:0;font-size:32px;font-weight:bold;color:#e74c3c;">${TEST_FAILED}</p>
+                                                <p style="margin:4px 0 0;font-size:12px;color:#888888;text-transform:uppercase;letter-spacing:1px;">Failed</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td width="24%" style="padding:4px;">
+                                    <table width="100%" cellpadding="16" style="background:#ffffff;border-radius:8px;border-top:4px solid #f39c12;">
+                                        <tr>
+                                            <td align="center">
+                                                <p style="margin:0;font-size:32px;font-weight:bold;color:#f39c12;">${TEST_SKIPPED}</p>
+                                                <p style="margin:4px 0 0;font-size:12px;color:#888888;text-transform:uppercase;letter-spacing:1px;">Skipped</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td width="24%" style="padding:4px;">
+                                    <table width="100%" cellpadding="16" style="background:#ffffff;border-radius:8px;border-top:4px solid #8B0000;">
+                                        <tr>
+                                            <td align="center">
+                                                <p style="margin:0;font-size:32px;font-weight:bold;color:#8B0000;">#${BUILD_NUMBER}</p>
+                                                <p style="margin:4px 0 0;font-size:12px;color:#888888;text-transform:uppercase;letter-spacing:1px;">Build</p>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </td>
                             </tr>
-                            <tr>
-                                <td><b>Passed</b></td>
-                                <td style="color:green"><b>${TEST_PASSED}</b></td>
+                        </table>
+
+                        <!-- Details table -->
+                        <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;background:#ffffff;border-radius:8px;overflow:hidden;">
+                            <tr style="background-color:#8B0000;">
+                                <td colspan="2" style="padding:12px 20px;">
+                                    <p style="margin:0;color:#ffffff;font-size:13px;font-weight:bold;letter-spacing:1px;">BUILD DETAILS</p>
+                                </td>
                             </tr>
-                            <tr>
-                                <td><b>Failed</b></td>
-                                <td style="color:red"><b>${TEST_FAILED}</b></td>
+                            <tr style="border-bottom:1px solid #f0f0f0;">
+                                <td style="padding:12px 20px;color:#888888;font-size:13px;width:40%;">Project</td>
+                                <td style="padding:12px 20px;color:#333333;font-size:13px;font-weight:bold;">Dubai Opera Test Suite</td>
                             </tr>
-                            <tr>
-                                <td><b>Skipped</b></td>
-                                <td style="color:orange"><b>${TEST_SKIPPED}</b></td>
+                            <tr style="border-bottom:1px solid #f0f0f0;background:#fafafa;">
+                                <td style="padding:12px 20px;color:#888888;font-size:13px;">Branch</td>
+                                <td style="padding:12px 20px;color:#333333;font-size:13px;font-weight:bold;">main</td>
                             </tr>
-                            <tr>
-                                <td><b>Duration</b></td>
-                                <td>${currentBuild.durationString}</td>
+                            <tr style="border-bottom:1px solid #f0f0f0;">
+                                <td style="padding:12px 20px;color:#888888;font-size:13px;">Environment</td>
+                                <td style="padding:12px 20px;color:#333333;font-size:13px;font-weight:bold;">localhost:3000</td>
+                            </tr>
+                            <tr style="background:#fafafa;">
+                                <td style="padding:12px 20px;color:#888888;font-size:13px;">Duration</td>
+                                <td style="padding:12px 20px;color:#333333;font-size:13px;font-weight:bold;">${currentBuild.durationString}</td>
                             </tr>
                         </table>
-                        <br/>
-                        <a href="${BUILD_URL}allure/">View Allure Report</a>
-                        &nbsp;&nbsp;|&nbsp;&nbsp;
-                        <a href="${BUILD_URL}console">View Console Output</a>
-                    </body></html>
-                """,
-                mimeType: 'text/html'
-            )
+
+                        <!-- Action buttons -->
+                        <table cellpadding="0" cellspacing="0" style="margin-top:24px;">
+                            <tr>
+                                <td style="padding-right:12px;">
+                                    <a href="${BUILD_URL}allure/" style="
+                                        background-color:#8B0000;
+                                        color:#ffffff;
+                                        padding:12px 24px;
+                                        text-decoration:none;
+                                        border-radius:6px;
+                                        font-size:13px;
+                                        font-weight:bold;
+                                        display:inline-block;
+                                    ">View Allure Report</a>
+                                </td>
+                                <td>
+                                    <a href="${BUILD_URL}console" style="
+                                        background-color:#ffffff;
+                                        color:#8B0000;
+                                        padding:12px 24px;
+                                        text-decoration:none;
+                                        border-radius:6px;
+                                        font-size:13px;
+                                        font-weight:bold;
+                                        display:inline-block;
+                                        border:2px solid #8B0000;
+                                    ">View Console Output</a>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Footer -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#333333;padding:16px 32px;">
+                <tr>
+                    <td>
+                        <p style="margin:0;color:#888888;font-size:12px;">
+                            This is an automated message from Jenkins CI — Dubai Opera Test Pipeline
+                        </p>
+                        <p style="margin:4px 0 0;color:#888888;font-size:12px;">
+                            Runs automatically every 2 hours
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+        </body>
+        </html>
+    """,
+    mimeType: 'text/html'
+)
         }
     }
 }
