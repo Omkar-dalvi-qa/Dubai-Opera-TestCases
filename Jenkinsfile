@@ -51,7 +51,7 @@ pipeline {
 
         stage('Generate Allure Report') {
             steps {
-                sh 'npx allure generate allure-results --clean -o allure-report || true'
+                sh 'npx allure generate allure-results --clean --output allure-report || true'
             }
         }
 

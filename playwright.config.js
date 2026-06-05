@@ -35,6 +35,7 @@ export default defineConfig({
     viewport: { width: 1440, height: 900 },
     screenshot: 'on',
   },
+  outputDir: 'test-results',
 
   /* Configure projects for major browsers */
   projects: [
