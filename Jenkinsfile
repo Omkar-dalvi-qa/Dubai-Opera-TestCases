@@ -26,11 +26,11 @@ pipeline {
         }
 
         stage('Run Tests') {
-            steps {
-                sh 'npx playwright test --reporter=line,allure-playwright || true'
-            }
-        }
-
+    steps {
+        sh 'mkdir -p test-results'
+        sh 'npx playwright test --reporter=line,allure-playwright || true'
+    }
+}
         stage('Parse Results') {
             steps {
                 script {
