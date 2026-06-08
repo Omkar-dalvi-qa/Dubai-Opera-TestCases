@@ -253,7 +253,7 @@ pipeline {
                                 color:#fff;padding:3px 10px;
                                 border-radius:12px;font-size:11px;">
                                 ${REGRESSION_TESTS == 'None'
-                                    ? 'NO NEW FAILURES' : 'REGRESSION'}
+                                    ? 'NEW FAILURE' : 'REGRESSION'}
                             </span>
                         </td>
                     </tr>
