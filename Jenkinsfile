@@ -45,22 +45,27 @@ pipeline {
 }
 
         stage('Parse Results') {
-            steps {
-                script {
-                    try {
-                        def results = readJSON file: 'test-results/results.json'
-                        env.TEST_PASSED  = results.stats.expected.toString()
-                        env.TEST_FAILED  = results.stats.unexpected.toString()
-                        env.TEST_SKIPPED = results.stats.skipped.toString()
-                    } catch (err) {
-                        echo "Could not read results.json: ${err}"
-                        env.TEST_PASSED  = 'N/A'
-                        env.TEST_FAILED  = 'N/A'
-                        env.TEST_SKIPPED = 'N/A'
-                    }
-                }
+    steps {
+        script {
+            try {
+                def results = readJSON file: 'test-results/results.json'
+                env.TEST_PASSED  = results.stats.expected.toString()
+                env.TEST_FAILED  = results.stats.unexpected.toString()
+                env.TEST_SKIPPED = results.stats.skipped.toString()
+            } catch (err) {
+                echo "Could not read results.json: ${err}"
+                env.TEST_PASSED  = 'N/A'
+                env.TEST_FAILED  = 'N/A'
+                env.TEST_SKIPPED = 'N/A'
             }
+
+            // ADD THESE 3 LINES ↓
+            env.GIT_COMMIT_AUTHOR = sh(script: "git log -1 --pretty='%an'", returnStdout: true).trim()
+            env.GIT_COMMIT_MSG    = sh(script: "git log -1 --pretty='%s'",  returnStdout: true).trim()
+            env.GIT_COMMIT_TIME   = sh(script: "git log -1 --pretty='%ad' --date=format:'%d %b %Y %H:%M'", returnStdout: true).trim()
         }
+    }
+}
 
     }
 
