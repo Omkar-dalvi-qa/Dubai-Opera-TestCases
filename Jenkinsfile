@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     options {
         disableConcurrentBuilds()  // ← add this line
     }
@@ -152,7 +152,7 @@ pipeline {
             ])
 
             emailext(
-                to: "omkardalvi861@gmail.com",
+                to: "omkardalvi861@gmail.com, ${params.DEV_EMAIL ?: ''}".trim().replaceAll(', $', ''),
                 subject: "Dubai Opera Tests — Build #${BUILD_NUMBER}: ${currentBuild.currentResult}",
                 body: """
                     <html>
