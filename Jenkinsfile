@@ -1,4 +1,7 @@
 pipeline {
+    
+    agent any
+
     parameters {
     string(name: 'DEV_AUTHOR', defaultValue: 'N/A', description: 'Developer name')
     string(name: 'DEV_COMMIT', defaultValue: 'N/A', description: 'Dev commit message')
@@ -6,7 +9,6 @@ pipeline {
     string(name: 'DEV_HASH',   defaultValue: 'N/A', description: 'Dev commit hash')
     string(name: 'DEV_EMAIL',  defaultValue: 'N/A', description: 'Developer email')
 }
-    agent any
 
     triggers {
         cron('0 */2 * * *')
