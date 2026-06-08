@@ -18,12 +18,12 @@ test.describe('Navigation Bar', () => {
 
   test('Programs dropdown appears on hover', async ({ navpg }) => {
     await navpg.hoverPrograms();
-    await expect(navpg.dropdownItems.first()).toBeVisible({ timeout: 3000 });
+    await expect(navpg.programsDropdownItems.first()).toBeVisible({ timeout: 3000 });
   });
 
   test('Visit dropdown appears on hover', async ({ navpg }) => {
     await navpg.hoverVisit();
-    await expect(navpg.dropdownItems.first()).toBeVisible({ timeout: 3000 });
+    await expect(navpg.visitDropdownItems.first()).toBeVisible({ timeout: 3000 });
   });
 
   test('About Us nav link is visible', async ({ navpg }) => {

@@ -13,8 +13,12 @@ class NavBarPage extends BasePage {
     this.cartLink     = page.getByTestId('nav-cart-link');
   }
 
-  get dropdownItems() {
-    return this.page.locator('[data-testid^="nav-dropdown-item-"]');
+  get programsDropdownItems() {
+    return this.page.getByTestId('nav-programs-dropdown-panel').locator('a');
+  }
+
+  get visitDropdownItems() {
+    return this.page.getByTestId('nav-visit-dropdown-panel').locator('a');
   }
 
   get searchInput() {
