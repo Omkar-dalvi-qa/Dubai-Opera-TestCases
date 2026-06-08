@@ -67,5 +67,5 @@
 //     await custpg.fillCustomerDetails();
     
 //     await paypg.fillPaymentDetails();
-//   });
+//   });/////
 // });
