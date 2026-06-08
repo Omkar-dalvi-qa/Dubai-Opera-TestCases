@@ -1,5 +1,12 @@
 pipeline {
     agent any
+    parameters {
+        string(name: 'DEV_AUTHOR', defaultValue: 'N/A', description: '')
+        string(name: 'DEV_EMAIL',  defaultValue: 'N/A', description: '')
+        string(name: 'DEV_MSG',    defaultValue: 'N/A', description: '')
+        string(name: 'DEV_DATE',   defaultValue: 'N/A', description: '')
+        string(name: 'DEV_HASH',   defaultValue: 'N/A', description: '')
+    }
 
     options {
         disableConcurrentBuilds()
@@ -53,56 +60,63 @@ pipeline {
         }
 
         stage('Parse Results') {
-            steps {
-                script {
-                    try {
-                        def results = readJSON file: 'test-suite/test-results/results.json'
-                        env.PASSED  = results.stats.expected.toString()
-                        env.FAILED  = results.stats.unexpected.toString()
-                        env.SKIPPED = results.stats.skipped.toString()
+    steps {
+        script {
+            try {
+                def results = readJSON file: 'test-suite/test-results/results.json'
+                env.PASSED  = results.stats.expected.toString()
+                env.FAILED  = results.stats.unexpected.toString()
+                env.SKIPPED = results.stats.skipped.toString()
 
-                        def failedTests = []
-                        results.suites.each { suite ->
-                            suite.suites.each { inner ->
-                                inner.specs.each { spec ->
-                                    if (!spec.ok) failedTests.add(spec.title)
-                                }
-                            }
+                def failedTests = []
+                results.suites.each { suite ->
+                    suite.suites.each { inner ->
+                        inner.specs.each { spec ->
+                            if (!spec.ok) failedTests.add(spec.title)
                         }
-                        env.FAILED_TESTS = failedTests.size() > 0
-                            ? failedTests.join(', ')
-                            : 'None'
-
-                    } catch (err) {
-                        env.PASSED       = 'N/A'
-                        env.FAILED       = 'N/A'
-                        env.SKIPPED      = 'N/A'
-                        env.FAILED_TESTS = 'N/A'
                     }
-
-                    // Tester info
-                    dir('test-suite') {
-                        env.TEST_AUTHOR = sh(
-                            script: "git log -1 --pretty='%an'",
-                            returnStdout: true).trim()
-                        env.TEST_MSG = sh(
-                            script: "git log -1 --pretty='%s'",
-                            returnStdout: true).trim()
-                        env.TEST_DATE = sh(
-                            script: "git log -1 --pretty='%ad' --date=format:'%d %b %Y %H:%M'",
-                            returnStdout: true).trim()
-                    }
-
-                    // Previous build
-                    def prev = currentBuild.previousBuild
-                    env.PREV_STATUS = prev ? prev.result.toString() : 'N/A'
-
-                    // Build email list safely
-env.EMAIL_TO = "omkardalvi861@gmail.com"
-if (env.DEV_EMAIL != null && env.DEV_EMAIL != '' && env.DEV_EMAIL != 'N/A') {
-    env.EMAIL_TO = env.EMAIL_TO + ',' + env.DEV_EMAIL
-}
                 }
+                env.FAILED_TESTS = failedTests.size() > 0
+                    ? failedTests.join(', ')
+                    : 'None'
+
+            } catch (err) {
+                env.PASSED       = 'N/A'
+                env.FAILED       = 'N/A'
+                env.SKIPPED      = 'N/A'
+                env.FAILED_TESTS = 'N/A'
+            }
+
+            // Tester info
+            dir('test-suite') {
+                env.TEST_AUTHOR = sh(
+                    script: "git log -1 --pretty='%an'",
+                    returnStdout: true).trim()
+                env.TEST_MSG = sh(
+                    script: "git log -1 --pretty='%s'",
+                    returnStdout: true).trim()
+                env.TEST_DATE = sh(
+                    script: "git log -1 --pretty='%ad' --date=format:'%d %b %Y %H:%M'",
+                    returnStdout: true).trim()
+            }
+
+            // Previous build
+            def prev = currentBuild.previousBuild
+            env.PREV_STATUS = prev ? prev.result.toString() : 'N/A'
+
+            // Regression check
+            env.REGRESSION_TESTS = env.FAILED != '0' && env.FAILED != 'N/A'
+                ? (prev?.result == 'UNSTABLE' ? 'REGRESSION' : 'NEW FAILURE')
+                : 'NONE'
+
+            // Build email list safely
+            env.EMAIL_TO = "omkardalvi861@gmail.com"
+            if (env.DEV_EMAIL != null && env.DEV_EMAIL != '' && env.DEV_EMAIL != 'N/A') {
+                env.EMAIL_TO = env.EMAIL_TO + ',' + env.DEV_EMAIL
+            }
+        }
+    }
+}
             }
         }
 
