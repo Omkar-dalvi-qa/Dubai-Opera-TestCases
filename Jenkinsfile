@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    
+    options {
+        disableConcurrentBuilds()  // ← add this line
+    }
 
     triggers {
         githubPush()
