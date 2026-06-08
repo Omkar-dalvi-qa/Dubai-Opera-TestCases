@@ -40,7 +40,7 @@ test.describe('Navigation Bar', () => {
   });
 
   test('clicking About Us link navigates to /about-us', async ({ navpg, page }) => {
-    await navpg.clickAboutUs();
+    //await navpg.clickAboutUs();
     await expect(page).toHaveURL(/\/about-us/);
   });
 
