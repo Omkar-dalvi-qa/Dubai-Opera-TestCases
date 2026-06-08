@@ -7,17 +7,7 @@ pipeline {
 
     triggers {
         cron('0 */2 * * *')
-        GenericTrigger(
-            genericVariables: [
-                [key: 'DEV_PUSH_REF',    value: '$.ref'],
-                [key: 'DEV_PUSHER_NAME', value: '$.pusher.name'],
-                [key: 'DEV_PUSH_MSG',    value: '$.head_commit.message']
-            ],
-            token: 'dubai-opera-dev-push',
-            causeString: 'Dev push by $DEV_PUSHER_NAME on $DEV_PUSH_REF',
-            printContributedVariables: false,
-            printPostContent: false
-        )
+        
     }
 
     tools {
@@ -162,7 +152,7 @@ pipeline {
             ])
 
             emailext(
-                to: "omkardalvi861@gmail.com",
+                 to: "omkardalvi861@gmail.com,omkar.dalvi@enpointe.io",
                 subject: "Dubai Opera Tests — Build #${BUILD_NUMBER}: ${currentBuild.currentResult}",
                 body: """
                     <html>
