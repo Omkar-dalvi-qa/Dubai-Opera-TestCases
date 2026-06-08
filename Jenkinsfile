@@ -1,4 +1,11 @@
 pipeline {
+    parameters {
+    string(name: 'DEV_AUTHOR', defaultValue: 'N/A', description: 'Developer name')
+    string(name: 'DEV_COMMIT', defaultValue: 'N/A', description: 'Dev commit message')
+    string(name: 'DEV_DATE',   defaultValue: 'N/A', description: 'Dev commit date')
+    string(name: 'DEV_HASH',   defaultValue: 'N/A', description: 'Dev commit hash')
+    string(name: 'DEV_EMAIL',  defaultValue: 'N/A', description: 'Developer email')
+}
     agent any
 
     triggers {
@@ -150,6 +157,85 @@ pipeline {
                                 </td>
                             </tr>
                         </table>
+                        <!-- Developer section -->
+<table width="100%" cellpadding="0" cellspacing="0"
+    style="margin-top:20px;background:#ffffff;
+    border-radius:8px;overflow:hidden;">
+    <tr style="background-color:#2c3e50;">
+        <td colspan="2" style="padding:12px 20px;">
+            <p style="margin:0;color:#ffffff;font-size:13px;
+                font-weight:bold;letter-spacing:1px;">
+                LATEST PUSH IN DEV REPO
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:12px 20px;color:#888;
+            font-size:13px;width:30%;">Developer</td>
+        <td style="padding:12px 20px;color:#333;
+            font-size:13px;font-weight:bold;">
+            ${params.DEV_AUTHOR} (${params.DEV_EMAIL})
+        </td>
+    </tr>
+    <tr style="background:#fafafa;">
+        <td style="padding:12px 20px;color:#888;font-size:13px;">
+            Last Commit</td>
+        <td style="padding:12px 20px;color:#333;font-size:13px;">
+            ${params.DEV_COMMIT}
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:12px 20px;color:#888;font-size:13px;">
+            Last Date</td>
+        <td style="padding:12px 20px;color:#333;font-size:13px;">
+            ${params.DEV_DATE}
+        </td>
+    </tr>
+    <tr style="background:#fafafa;">
+        <td style="padding:12px 20px;color:#888;font-size:13px;">
+            Commit Hash</td>
+        <td style="padding:12px 20px;color:#333;
+            font-size:13px;font-family:monospace;">
+            ${params.DEV_HASH}
+        </td>
+    </tr>
+</table>
+
+<!-- Tester section -->
+<table width="100%" cellpadding="0" cellspacing="0"
+    style="margin-top:20px;background:#ffffff;
+    border-radius:8px;overflow:hidden;">
+    <tr style="background-color:#8B0000;">
+        <td colspan="2" style="padding:12px 20px;">
+            <p style="margin:0;color:#ffffff;font-size:13px;
+                font-weight:bold;letter-spacing:1px;">
+                LATEST PUSH IN TEST REPO
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:12px 20px;color:#888;
+            font-size:13px;width:30%;">Tester</td>
+        <td style="padding:12px 20px;color:#333;
+            font-size:13px;font-weight:bold;">
+            ${GIT_COMMIT_AUTHOR}
+        </td>
+    </tr>
+    <tr style="background:#fafafa;">
+        <td style="padding:12px 20px;color:#888;font-size:13px;">
+            Last Commit</td>
+        <td style="padding:12px 20px;color:#333;font-size:13px;">
+            ${GIT_COMMIT_MSG}
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:12px 20px;color:#888;font-size:13px;">
+            Last Date</td>
+        <td style="padding:12px 20px;color:#333;font-size:13px;">
+            ${GIT_COMMIT_TIME}
+        </td>
+    </tr>
+</table>
 
                         <!-- Details table -->
                         <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;background:#ffffff;border-radius:8px;overflow:hidden;">
