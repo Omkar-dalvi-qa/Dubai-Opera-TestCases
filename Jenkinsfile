@@ -66,7 +66,7 @@ pipeline {
                         git branch: 'main',
                             url: 'https://github.com/Omkar-dalvi-qa/Dubai-Opera-TestCases.git'
                         sh 'npm ci'
-                        sh 'npx playwright install'
+                        sh 'npx playwright install --with-deps'
                         sh 'rm -rf allure-results'
                         sh 'rm -rf test-results'
                         sh 'mkdir -p test-results'
