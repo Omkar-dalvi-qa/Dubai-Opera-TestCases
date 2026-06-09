@@ -1,8 +1,6 @@
 pipeline {
     agent any
 
-    
-
     options {
         disableConcurrentBuilds()
     }
@@ -16,7 +14,6 @@ pipeline {
     }
 
     stages {
-
         stage('Run Tests') {
             steps {
                 script {
@@ -28,6 +25,37 @@ pipeline {
                         sh 'rm -rf allure-results'
                         sh 'mkdir -p test-results'
                         sh 'npx playwright test || true'
+                    }
+                }
+            }
+        }
+        stage('Read Dev Commit') {
+            steps {
+                script {
+                    try {
+                        def apiResponse = sh(
+                    script: '''
+                        curl -s https://api.github.com/repos/Omkar-dalvi-qa/Dubai-Opera-dev-Repo/commits/main
+                    ''',
+                    returnStdout: true
+                ).trim()
+
+                        def json = readJSON text: apiResponse
+                        env.DEV_AUTHOR = json.commit.author.name
+                        env.DEV_EMAIL  = json.commit.author.email
+                        env.DEV_MSG    = json.commit.message
+                        env.DEV_DATE   = json.commit.author.date
+                        env.DEV_HASH   = json.sha.take(7)
+
+                        echo "Developer: ${env.DEV_AUTHOR}"
+                        echo "Commit: ${env.DEV_MSG}"
+            } catch (err) {
+                        echo "Could not read dev info: ${err}"
+                        env.DEV_AUTHOR = 'N/A'
+                        env.DEV_EMAIL  = 'N/A'
+                        env.DEV_MSG    = 'N/A'
+                        env.DEV_DATE   = 'N/A'
+                        env.DEV_HASH   = 'N/A'
                     }
                 }
             }
@@ -50,10 +78,14 @@ pipeline {
                                 }
                             }
                         }
-                        env.FAILED_TESTS = failedTests.size() > 0
-                            ? failedTests.join(', ')
-                            : 'None'
-
+                        if (failedTests.size() > 0) {
+                            def numbered = failedTests.withIndex(1).collect { test, i ->
+                                "${i}. ${test}"
+                            }
+                            env.FAILED_TESTS = numbered.join('<br/>')
+} else {
+                            env.FAILED_TESTS = 'None'
+                        }
                     } catch (err) {
                         echo "Could not read results: ${err}"
                         env.PASSED       = 'N/A'
@@ -85,14 +117,13 @@ pipeline {
                         : 'NONE'
 
                     // Email recipients
-                    env.EMAIL_TO = "omkardalvi861@gmail.com"
-                    if (params.DEV_EMAIL != null && params.DEV_EMAIL != '' && params.DEV_EMAIL != 'N/A') {
-                        env.EMAIL_TO = env.EMAIL_TO + ',' + params.DEV_EMAIL
+                    env.EMAIL_TO = 'omkardalvi861@gmail.com'
+                    if (env.DEV_EMAIL != null && env.DEV_EMAIL != '' && env.DEV_EMAIL != 'N/A') {
+                        env.EMAIL_TO = env.EMAIL_TO + ',' + env.DEV_EMAIL
                     }
                 }
             }
         }
-
     }
 
     post {
@@ -227,26 +258,26 @@ pipeline {
                             font-size:12px;width:30%;">Developer</td>
                         <td style="padding:10px 16px;color:#333;
                             font-size:12px;font-weight:bold;">
-                            ${params.DEV_AUTHOR} (${params.DEV_EMAIL})</td>
+                            ${env.DEV_AUTHOR} (${env.DEV_EMAIL})</td>
                     </tr>
                     <tr style="background:#fafafa;">
                         <td style="padding:10px 16px;color:#888;
                             font-size:12px;">Last Commit</td>
                         <td style="padding:10px 16px;color:#333;
-                            font-size:12px;">${params.DEV_MSG}</td>
+                            font-size:12px;">${env.DEV_MSG}</td>
                     </tr>
                     <tr>
                         <td style="padding:10px 16px;color:#888;
                             font-size:12px;">Date</td>
                         <td style="padding:10px 16px;color:#333;
-                            font-size:12px;">${params.DEV_DATE}</td>
+                            font-size:12px;">${env.DEV_DATE}</td>
                     </tr>
                     <tr style="background:#fafafa;">
                         <td style="padding:10px 16px;color:#888;
                             font-size:12px;">Hash</td>
                         <td style="padding:10px 16px;color:#333;
                             font-size:12px;font-family:monospace;">
-                            ${params.DEV_HASH}</td>
+                            ${env.DEV_HASH}</td>
                     </tr>
                 </table>
 
@@ -343,5 +374,4 @@ pipeline {
             )
         }
     }
-
 }
