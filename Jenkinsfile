@@ -64,7 +64,11 @@ pipeline {
         stage('Parse Results') {
             steps {
                 script {
+                    sh 'echo "Checking results file..."'
+            sh 'ls -la test-suite/test-results/ || echo "DIRECTORY NOT FOUND"'
+            sh 'ls test-suite/test-results/results.json && echo "FILE EXISTS" || echo "FILE NOT FOUND"'
                     try {
+                        
                         def results = readJSON file: 'test-suite/test-results/results.json'
                         env.PASSED  = results.stats.expected.toString()
                         env.FAILED  = results.stats.unexpected.toString()
@@ -112,9 +116,9 @@ pipeline {
                     env.PREV_STATUS = prev ? prev.result.toString() : 'N/A'
 
                     // Regression check
-                    env.REGRESSION_TESTS = env.FAILED != '0' && env.FAILED != 'N/A'
-                        ? (prev?.result == 'UNSTABLE' ? 'REGRESSION' : 'NEW FAILURE')
-                        : 'NONE'
+                    env.REGRESSION_TESTS = (env.FAILED != null && env.FAILED != 'N/A' && env.FAILED != '0')
+    ? (prev?.result == 'UNSTABLE' ? 'REGRESSION' : 'NEW FAILURE')
+    : (env.FAILED == 'N/A' ? 'UNKNOWN' : 'NONE')
 
                     // Email recipients
                     env.EMAIL_TO = 'omkardalvi861@gmail.com'
