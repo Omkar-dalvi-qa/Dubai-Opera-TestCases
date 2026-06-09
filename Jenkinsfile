@@ -7,7 +7,7 @@ pipeline {
     FAILED_TESTS = 'N/A'
     PREV_STATUS  = 'N/A'
     REGRESSION_TESTS = 'UNKNOWN'
-    EMAIL_TO     = 'omkardalvi861@gmail.com'
+    EMAIL_TO     = 'omkar.dalvi@enpointe.io'
     DEV_AUTHOR   = 'N/A'
     DEV_EMAIL    = 'N/A'
     DEV_MSG      = 'N/A'
