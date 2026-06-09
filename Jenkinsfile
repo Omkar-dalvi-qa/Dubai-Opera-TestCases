@@ -23,7 +23,7 @@ pipeline {
     }
 
     triggers {
-        cron('0 */2 * * *')
+        githubPush()
     }
 
     tools {
