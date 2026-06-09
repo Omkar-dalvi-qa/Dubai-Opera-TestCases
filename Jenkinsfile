@@ -83,13 +83,14 @@ pipeline {
                             }
                         }
                         if (failedTests.size() > 0) {
-                            def numbered = failedTests.withIndex(1).collect { test, i ->
-                                "${i}. ${test}"
-                            }
-                            env.FAILED_TESTS = numbered.join('<br/>')
-                        } else {
-                            env.FAILED_TESTS = 'None'
-                        }
+    def numbered = []
+    for (int i = 0; i < failedTests.size(); i++) {
+        numbered.add("${i + 1}. ${failedTests[i]}")
+    }
+    env.FAILED_TESTS = numbered.join('<br/>')
+} else {
+    env.FAILED_TESTS = 'None'
+}
 
                     } catch (err) {
                         echo "ERROR reading results: ${err}"
