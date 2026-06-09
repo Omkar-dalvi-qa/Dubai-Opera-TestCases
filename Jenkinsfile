@@ -1,5 +1,22 @@
 pipeline {
     agent any
+    environment {
+    PASSED       = 'N/A'
+    FAILED       = 'N/A'
+    SKIPPED      = 'N/A'
+    FAILED_TESTS = 'N/A'
+    PREV_STATUS  = 'N/A'
+    REGRESSION_TESTS = 'UNKNOWN'
+    EMAIL_TO     = 'omkardalvi861@gmail.com'
+    DEV_AUTHOR   = 'N/A'
+    DEV_EMAIL    = 'N/A'
+    DEV_MSG      = 'N/A'
+    DEV_DATE     = 'N/A'
+    DEV_HASH     = 'N/A'
+    TEST_AUTHOR  = 'N/A'
+    TEST_MSG     = 'N/A'
+    TEST_DATE    = 'N/A'
+}
 
     options {
         disableConcurrentBuilds()
@@ -49,7 +66,7 @@ pipeline {
                         git branch: 'main',
                             url: 'https://github.com/Omkar-dalvi-qa/Dubai-Opera-TestCases.git'
                         sh 'npm ci'
-                        sh 'npx playwright install --with-deps'
+                        sh 'npx playwright install'
                         sh 'rm -rf allure-results'
                         sh 'rm -rf test-results'
                         sh 'mkdir -p test-results'
