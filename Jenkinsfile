@@ -7,7 +7,7 @@ pipeline {
     FAILED_TESTS = 'N/A'
     PREV_STATUS  = 'N/A'
     REGRESSION_TESTS = 'UNKNOWN'
-    EMAIL_TO     = 'omkar.dalvi@enpointe.io'
+    EMAIL_TO     = 'omkardalvi861@gmail.com'
     DEV_AUTHOR   = 'N/A'
     DEV_EMAIL    = 'N/A'
     DEV_MSG      = 'N/A'
@@ -140,7 +140,7 @@ pipeline {
                         : (env.FAILED == 'N/A' ? 'UNKNOWN' : 'NONE')
 
                     // Email recipients
-                    env.EMAIL_TO = 'omkar.dalvi@enpointe.io'
+                    env.EMAIL_TO = 'omkardalvi861@gmail.com'
                     if (env.DEV_EMAIL != null && env.DEV_EMAIL != '' && env.DEV_EMAIL != 'N/A') {
                         env.EMAIL_TO = env.EMAIL_TO + ',' + env.DEV_EMAIL
                     }
