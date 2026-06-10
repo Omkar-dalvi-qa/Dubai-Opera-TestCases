@@ -1,22 +1,6 @@
 pipeline {
     agent any
-    environment {
-    PASSED       = 'N/A'
-    FAILED       = 'N/A'
-    SKIPPED      = 'N/A'
-    FAILED_TESTS = 'N/A'
-    PREV_STATUS  = 'N/A'
-    REGRESSION_TESTS = 'UNKNOWN'
-    EMAIL_TO     = 'omkardalvi861@gmail.com'
-    DEV_AUTHOR   = 'N/A'
-    DEV_EMAIL    = 'N/A'
-    DEV_MSG      = 'N/A'
-    DEV_DATE     = 'N/A'
-    DEV_HASH     = 'N/A'
-    TEST_AUTHOR  = 'N/A'
-    TEST_MSG     = 'N/A'
-    TEST_DATE    = 'N/A'
-}
+    
 
     options {
         disableConcurrentBuilds()
