@@ -124,7 +124,7 @@ pipeline {
                         : (env.FAILED == 'N/A' ? 'UNKNOWN' : 'NONE')
 
                     // Email recipients
-                    env.EMAIL_TO = 'omkardalvi861@gmail.com'
+                    env.EMAIL_TO = 'omkar.dalvi@enpointe.io'
                     if (env.DEV_EMAIL != null && env.DEV_EMAIL != '' && env.DEV_EMAIL != 'N/A') {
                         env.EMAIL_TO = env.EMAIL_TO + ',' + env.DEV_EMAIL
                     }
