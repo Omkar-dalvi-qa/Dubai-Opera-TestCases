@@ -235,19 +235,19 @@ pipeline {
                     </tr>
                     <tr>
                         <td style="padding:10px 16px;color:#888;font-size:12px;width:30%;">Developer</td>
-                        <td style="padding:10px 16px;color:#333;font-size:12px;font-weight:bold;">${DEV_AUTHOR} (${DEV_EMAIL})</td>
+                        <td style="padding:10px 16px;color:#333;font-size:12px;font-weight:bold;">${params.DEV_AUTHOR} (${params.DEV_EMAIL})</td>
                     </tr>
                     <tr style="background:#fafafa;">
                         <td style="padding:10px 16px;color:#888;font-size:12px;">Last Commit</td>
-                        <td style="padding:10px 16px;color:#333;font-size:12px;">${DEV_MSG}</td>
+                        <td style="padding:10px 16px;color:#333;font-size:12px;">${params.DEV_MSG}</td>
                     </tr>
                     <tr>
                         <td style="padding:10px 16px;color:#888;font-size:12px;">Date</td>
-                        <td style="padding:10px 16px;color:#333;font-size:12px;">${DEV_DATE}</td>
+                        <td style="padding:10px 16px;color:#333;font-size:12px;">${params.DEV_DATE}</td>
                     </tr>
                     <tr style="background:#fafafa;">
                         <td style="padding:10px 16px;color:#888;font-size:12px;">Hash</td>
-                        <td style="padding:10px 16px;color:#333;font-size:12px;font-family:monospace;">${DEV_HASH}</td>
+                        <td style="padding:10px 16px;color:#333;font-size:12px;font-family:monospace;">${params.DEV_HASH}</td>
                     </tr>
                 </table>
 
@@ -313,3 +313,4 @@ pipeline {
         }
     }
 }
+///bhjsdbhjb
