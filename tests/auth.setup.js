@@ -1,5 +1,6 @@
 const { test } = require('../utils/fixtures');
 const { LoginPage } = require('../pages/LoginPage');
+const { EMAAR_EMAIL, EMAAR_PASSWORD } = require('../utils/constants');
 
 const authFile = 'playwright/.auth/user.json';
 
@@ -14,7 +15,7 @@ test('authenticate via Emaar PASS', async ({ page, homepg }) => {
   await page.getByRole('button', { name: 'Sign In', exact: true }).nth(1).click();
   await page.waitForURL(/emaar/, { timeout: 15000 });
 
-  await loginpg.login(process.env.EMAAR_EMAIL, process.env.EMAAR_PASSWORD);
+  await loginpg.login(EMAAR_EMAIL, EMAAR_PASSWORD);
 
   await page.waitForURL(/uat-opera\.enpointe\.io/, { timeout: 20000 });
   await page.context().storageState({ path: authFile });

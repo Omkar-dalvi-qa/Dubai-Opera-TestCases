@@ -35,13 +35,9 @@ pipeline {
                 // Logs in once and saves the session to playwright/.auth/user.json,
                 // which bookingFlow.spec.js's Venue Tour test then loads via
                 // test.use({ storageState: ... }) — see tests/auth.setup.js.
-                withCredentials([usernamePassword(
-                    credentialsId: 'emaar-pass-qa',
-                    usernameVariable: 'EMAAR_EMAIL',
-                    passwordVariable: 'EMAAR_PASSWORD'
-                )]) {
-                    sh 'npx playwright test --project=setup'
-                }
+                // Credentials come from utils/constants.js (committed on purpose,
+                // shared QA account) — no Jenkins Credential needed for this.
+                sh 'npx playwright test --project=setup'
             }
         }
 

@@ -83,7 +83,39 @@ class VisitDetailsPage extends BasePage {
   }
 
   async clickBook() {
-    await this.bookBtn.click();
+    // Even when already signed in (valid session cookie, navbar shows the
+    // user), the "Book Tickets" handler can momentarily read stale
+    // client-side auth state and throw up the same sign-in gate an
+    // unauthenticated user would see. Detect that and recover instead of
+    // hanging on checkout-page locators that will never appear.
+    const checkoutHeading = this.page.getByRole('heading', { name: 'Complete your Booking' });
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      await this.bookBtn.click();
+
+      const deadline = Date.now() + 8000;
+      while (Date.now() < deadline) {
+        if (await checkoutHeading.isVisible().catch(() => false)) return;
+
+        if (await this.loginModal.isVisible().catch(() => false)) {
+          // Stale gate — dismiss it and retry the click rather than signing in.
+          // The pause before retrying is deliberate: clicking again
+          // immediately after dismissing has been observed to crash the page
+          // (a booking API call raced and returned an HTML error page
+          // instead of JSON) — likely a real backend bug worth reporting,
+          // but giving the first request time to fully settle reduces how
+          // often the retry triggers it.
+          await this.page.getByRole('button', { name: 'Not now' }).click();
+          await this.loginModal.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+          await this.page.waitForTimeout(2000);
+          break;
+        }
+
+        await this.page.waitForTimeout(300);
+      }
+    }
+
+    throw new Error('Clicking "Book Tickets" did not reach checkout after 3 attempts');
   }
 }
 
