@@ -1,29 +1,42 @@
 const { BasePage } = require('./BasePage');
 
+// No data-testid on the live tours page (dev team declined to add one), so every
+// locator here is built from role/text/DOM structure instead. Verified against
+// https://uat-opera.enpointe.io/en/visit/tours.
 class VisitDetailsPage extends BasePage {
   constructor(page) {
     super(page);
-    this.datePickerSection   = page.getByTestId('date-picker-section');
-    this.timeSlotSection     = page.getByTestId('tour-time-slot-section');
-    this.ticketRows          = page.getByTestId('tour-ticket-rows');
-    this.bookBtn             = page.getByTestId('tour-book-btn');
-    this.loginModal          = page.getByTestId('login-modal');
-    this.loginModalSignInBtn = page.getByTestId('login-modal-signin-btn');
+    // The page renders a duplicate booking widget for mobile, inside a
+    // collapsible panel that can enter the accessibility tree even at a
+    // desktop viewport once expanded — .first() pins these to the real
+    // (desktop) widget so they don't strict-mode-violate intermittently.
+    this.calendarBtn = page.getByRole('button', { name: 'Open calendar' }).first();
+    this.bookBtn      = page.getByRole('button', { name: 'Book Tickets' }).first();
+
+    // Scope ticket-row lookups to that same widget so labels like "ADULT"
+    // can't accidentally match unrelated marketing copy elsewhere on the page.
+    this.ticketWidget = this.bookBtn.locator('xpath=ancestor::div[contains(@class,"hidden lg:block")][1]');
+    this.timeSlotButtons = this.ticketWidget.getByRole('button', { name: /^\d{1,2}:\d{2}\s?(AM|PM)$/i });
+
+    this.loginModal          = page.getByRole('dialog');
+    this.loginModalSignInBtn = this.loginModal.getByRole('button', { name: 'Sign In' });
   }
 
   async openCalendar() {
-    await this.page.locator('.react-datepicker-wrapper').first().click();
-    await this.page.waitForSelector('.react-datepicker', { timeout: 5000 });
-  }
+    // Same hydration race as clickvenueTourBtn: the button is visible and
+    // stable (passes actionability) before React has attached its onClick,
+    // so a fast, non-debug run can click it and have nothing happen. Retry
+    // instead of trusting one click.
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      await this.calendarBtn.click();
+      const opened = await this.page
+        .waitForSelector('.react-datepicker', { timeout: 4000 })
+        .then(() => true)
+        .catch(() => false);
+      if (opened) return;
+    }
 
-  get disabledCalendarDays() {
-    return this.page.locator('.react-datepicker__day--disabled:not(.react-datepicker__day--outside-month)');
-  }
-
-  get disabledTimeSlots() {
-    // Use a CSS attribute selector so we match the button that IS disabled,
-    // not a button that contains a disabled child (which filter+has would do).
-    return this.timeSlotSection.locator('[data-testid="tour-time-slot-btn"][disabled]');
+    throw new Error('Clicking "Open calendar" did not open the datepicker after 3 attempts');
   }
 
   async selectFirstAvailableDate() {
@@ -35,43 +48,37 @@ class VisitDetailsPage extends BasePage {
   }
 
   async selectFirstAvailableTimeSlot() {
-  const slots = this.timeSlotSection.getByTestId('tour-time-slot-btn');
+    const slots = this.timeSlotButtons;
+    const count = await slots.count();
 
-  //await expect(slots.first()).toBeVisible({ timeout: 5000 });
+    for (let i = 0; i < count; i++) {
+      const slot = slots.nth(i);
 
-  const count = await slots.count();
-
-  for (let i = 0; i < count; i++) {
-    const slot = slots.nth(i);
-
-    if (await slot.isVisible() && !(await slot.isDisabled())) {
-      await slot.click();
-      return slot;
+      if (await slot.isVisible() && !(await slot.isDisabled())) {
+        await slot.click();
+        return slot;
+      }
     }
+
+    throw new Error('No enabled time slot available');
   }
 
-  throw new Error('No enabled time slot available');
-}
-
-  // Clicks increment for the ticket row matching `label` (regex or string).
+  // Clicks the "+" for the ticket row whose label matches `label` (string or regex).
   // Returns the quantity locator so the test can assert the new count.
   async addTicket(label) {
-    const row = this.ticketRows
-      .getByTestId('tour-ticket-row')
-      .filter({ has: this.page.getByTestId('tour-ticket-label').filter({ hasText: label }) })
-      .first();
-    await row.getByTestId('tour-ticket-increment').click();
-    return row.getByTestId('tour-ticket-quantity');
+    const row = this.ticketWidget.getByText(label).first();
+    await row.locator('xpath=following::button[normalize-space(text())="+"][1]').click();
+    return row.locator('xpath=following::span[1]');
   }
 
-  // Waits for ticket rows, adds one of each type, and verifies each quantity shows "1".
+  // Waits for the ticket widget, adds one of each type, and verifies each quantity shows "1".
   async addDefaultTickets(expect) {
-    await expect(this.ticketRows).toBeVisible({ timeout: 5000 });
-    const adultQty = await this.addTicket(/adult/i);
+    await expect(this.bookBtn).toBeVisible({ timeout: 5000 });
+    const adultQty = await this.addTicket('ADULT');
     await expect(adultQty).toHaveText('1');
-    const childQty = await this.addTicket(/child/i);
+    const childQty = await this.addTicket(/CHILD/i);
     await expect(childQty).toHaveText('1');
-    const bisouQty = await this.addTicket(/bisou/i);
+    const bisouQty = await this.addTicket(/BISOU/i);
     await expect(bisouQty).toHaveText('1');
   }
 

@@ -1,3 +1,3 @@
-const BASE_URL = 'http://localhost:3000/en';
+const BASE_URL = 'https://uat-opera.enpointe.io/en';
 
 module.exports = { BASE_URL };

@@ -1,4 +1,5 @@
 
+require('dotenv').config();
 const { defineConfig, devices } = require('@playwright/test');
 
 module.exports = defineConfig({
@@ -24,6 +25,12 @@ module.exports = defineConfig({
   outputDir: 'test-results',
 
   projects: [
+    // Only runs when targeted explicitly (--project=setup), never as part of a
+    // plain `npx playwright test` run — keeps it from touching unrelated specs.
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.js$/,
+    },
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },

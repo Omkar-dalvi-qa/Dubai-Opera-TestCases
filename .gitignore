@@ -6,3 +6,10 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Secrets
+.env
+
+# Test artifacts
+allure-results/
+screenshots/
