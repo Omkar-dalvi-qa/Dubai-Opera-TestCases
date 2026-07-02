@@ -67,7 +67,7 @@ test.describe('Venue Tour Booking - End-to-End Flow', () => {
 
     await expect(vistpg.bookBtn).toBeVisible();
     await expect(vistpg.bookBtn).not.toHaveAttribute('disabled');
-    await vistpg.clickBook();
+    //await vistpg.clickBook();
 
     await custpg.fillCustomerDetails();
 

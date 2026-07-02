@@ -5,7 +5,7 @@ pipeline {
         disableConcurrentBuilds()
     }
 
-    // Runs on this repo directly — no separate clone step needed since the
+    
     // Jenkins job checks this repo out to run the Jenkinsfile in the first place.
     triggers {
         cron('0 */2 * * *')
