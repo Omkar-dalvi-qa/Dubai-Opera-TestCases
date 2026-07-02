@@ -1,3 +1,19 @@
+// Recursive closures inside a declarative `script {}` block frequently get
+// rejected by Jenkins' CPS sandbox transformation (silently, if wrapped in a
+// try/catch) — @NonCPS runs this as plain, non-serialized Groovy instead,
+// which is the standard way to walk parsed JSON like this in a Jenkinsfile.
+@NonCPS
+def collectFailedTestTitles(suites) {
+    def failedTests = []
+    def walk
+    walk = { suite ->
+        suite.specs?.each { spec -> if (!spec.ok) failedTests.add(spec.title) }
+        suite.suites?.each { child -> walk(child) }
+    }
+    suites.each { suite -> walk(suite) }
+    return failedTests
+}
+
 pipeline {
     agent any
 
@@ -43,7 +59,11 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh 'rm -rf test-results allure-results'
-                sh 'npx playwright test'
+                // --project=chromium excludes the "setup" project — otherwise
+                // Playwright re-runs auth.setup.js a second time here (it
+                // already ran in the Authenticate stage above) and it gets
+                // counted as one of the pass/fail totals in the report.
+                sh 'npx playwright test --project=chromium'
             }
         }
     }
@@ -80,15 +100,10 @@ pipeline {
                         // Suite nesting depth varies: a bare test() (like
                         // auth.setup.js) puts specs directly on the file-level
                         // suite, while a test.describe() block (like
-                        // bookingFlow.spec.js) adds one more suite level. Walk
-                        // recursively instead of assuming a fixed depth.
-                        def failedTests = []
-                        def collectFailed
-                        collectFailed = { suite ->
-                            suite.specs?.each { spec -> if (!spec.ok) failedTests.add(spec.title) }
-                            suite.suites?.each { child -> collectFailed(child) }
-                        }
-                        results.suites.each { suite -> collectFailed(suite) }
+                        // bookingFlow.spec.js) adds one more suite level —
+                        // collectFailedTestTitles() walks recursively instead
+                        // of assuming a fixed depth.
+                        def failedTests = collectFailedTestTitles(results.suites)
 
                         failedTestsHtml = failedTests.isEmpty()
                             ? 'None'
