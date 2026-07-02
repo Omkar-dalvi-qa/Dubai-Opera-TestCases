@@ -105,9 +105,19 @@ pipeline {
                         // of assuming a fixed depth.
                         def failedTests = collectFailedTestTitles(results.suites)
 
-                        failedTestsHtml = failedTests.isEmpty()
-                            ? 'None'
-                            : failedTests.withIndex(1).collect { title, i -> "${i}. ${title}" }.join('<br/>')
+                        if (failedTests.isEmpty()) {
+                            failedTestsHtml = 'None'
+                        } else {
+                            // Not withIndex()/collect() — those static methods
+                            // aren't in the Jenkins sandbox whitelist and throw
+                            // RejectedAccessException, which needs an admin to
+                            // approve. A plain indexed loop needs no approval.
+                            def numbered = []
+                            for (int i = 0; i < failedTests.size(); i++) {
+                                numbered.add("${i + 1}. ${failedTests[i]}")
+                            }
+                            failedTestsHtml = numbered.join('<br/>')
+                        }
                     } catch (err) {
                         echo "Could not parse ${jsonFile}: ${err}"
                     }
