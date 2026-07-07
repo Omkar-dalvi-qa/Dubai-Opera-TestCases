@@ -23,7 +23,7 @@ pipeline {
 
     // Jenkins job checks this repo out to run the Jenkinsfile in the first place.
     triggers {
-        cron('0 */2 * * *')
+        cron('0 */4 * * *')
     }
 
     tools {
