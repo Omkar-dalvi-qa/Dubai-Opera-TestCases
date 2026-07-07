@@ -1,25 +1,26 @@
 const { BasePage } = require('./BasePage');
 
+// No data-testid on the live event pages either — locators built from
+// role/text, verified against a real event (concerts/marilyne-naaman).
 class EventDetailPage extends BasePage {
   constructor(page) {
     super(page);
-    this.datePickerSection = page.getByTestId('date-picker-section');
-    this.timeSlotSection   = page.getByTestId('time-slot-section');
-    this.bookBtn           = page.getByTestId('book-tickets-btn');
+    this.calendarBtn = page.getByRole('button', { name: 'Open calendar' }).first();
+    this.bookBtn      = page.getByRole('button', { name: 'Book tickets' }).first();
   }
 
+  // Some events only have a single date/time — the calendar button is
+  // disabled and that one date is already selected, so there's nothing to
+  // click. Returns false in that case rather than treating it as a failure.
   async selectFirstAvailableDate() {
-    const visible = await this.datePickerSection.isVisible().catch(() => false);
-    if (!visible) return false;
+    if (!(await this.calendarBtn.isEnabled().catch(() => false))) return false;
 
-    await this.datePickerSection.locator('button').first().click();
+    await this.calendarBtn.click();
     await this.page.waitForSelector('.react-datepicker', { timeout: 5000 });
-
     await this.page
       .locator('.react-datepicker__day:not(.react-datepicker__day--disabled):not(.react-datepicker__day--outside-month)')
       .first()
       .click();
-
     await this.page
       .waitForSelector('.react-datepicker', { state: 'hidden', timeout: 3000 })
       .catch(() => {});
@@ -27,32 +28,26 @@ class EventDetailPage extends BasePage {
     return true;
   }
 
+  // Same idea as the date: a single-timeslot event has nothing enabled to
+  // click (it's already selected), so this returns null instead of throwing.
   async selectFirstAvailableTimeSlot() {
-    const visible = await this.timeSlotSection.isVisible().catch(() => false);
-    if (!visible) return null;
+    const slots = this.page.getByRole('button', { name: /^\d{1,2}:\d{2}\s?(AM|PM)$/i });
+    const count = await slots.count();
 
-    const slot = this.timeSlotSection
-      .getByTestId('time-slot-btn')
-      .filter({ hasNot: this.page.locator('[disabled]') })
-      .first();
+    for (let i = 0; i < count; i++) {
+      const slot = slots.nth(i);
+      if (await slot.isVisible() && !(await slot.isDisabled())) {
+        await slot.click();
+        return slot;
+      }
+    }
 
-    await slot.waitFor({ state: 'visible', timeout: 5000 });
-    await slot.click();
-    return slot;
-  }
-
-  async isBookButtonEnabled() {
-    const disabled = await this.bookBtn.getAttribute('disabled');
-    return disabled === null;
+    return null;
   }
 
   async clickBook() {
     await this.bookBtn.click();
-    await this.page.waitForLoadState('networkidle');
-  }
-
-  async signInBtn(){
-    return this.page.getByTestId('login-modal-signin-btn');
+    await this.page.waitForURL(/\/booking\/(seats|checkout)/, { timeout: 15000 });
   }
 }
 

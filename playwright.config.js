@@ -31,8 +31,12 @@ module.exports = defineConfig({
       testMatch: /.*\.setup\.js$/,
     },
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+     name: 'chromium',
+        use: { 
+            ...devices['Desktop Chrome'],
+            storageState: 'playwright/.auth/user.json', 
+        },
+        dependencies: ['setup'], 
     },
   ],
 });

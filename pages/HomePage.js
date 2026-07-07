@@ -10,10 +10,11 @@ class HomePage extends BasePage {
     this.whatsOnGrid    = page.getByTestId('whats-on-grid');
     this.eventCards     = page.getByTestId('event-card');
     this.viewAllCard    = page.getByTestId('whats-on-view-all-card');
-    // No data-testid on the live site — dev team declined to add one, so this
-    // is matched on the link's visible text/target instead.
+   
     this.venueTourBtn = page.getByRole('link', { name: 'Book A Tour' });
 
+   
+    this.internalEventCards = page.locator('div[data-analytics-item="true"] > a[href*="/en/events/"]');
   }
 
   async goto() {
@@ -37,12 +38,29 @@ class HomePage extends BasePage {
     await this.page.waitForLoadState('networkidle');
   }
 
+  async clickSecondEventCard() {
+    // Index 1 (the 2nd internal card) is currently the first event that
+    // actually uses the reserved-seating flow — index 0 ("Taha Desouky")
+    // uses a simpler ticket-quantity model with no seat map at all. This
+    // list is content-managed and could reorder; if this starts failing,
+    // re-check which card actually leads to /booking/seats.
+    const card = this.internalEventCards.nth(1);
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+     
+      await card.click({ timeout: 8000 }).catch(() => {});
+      const arrived = await this.page
+        .waitForURL(/\/events\/.+\/.+/, { timeout: 8000 })
+        .then(() => true)
+        .catch(() => false);
+      if (arrived) return;
+    }
+
+    throw new Error('Clicking the 2nd event card did not navigate to an event detail page after 3 attempts');
+  }
+
   async clickvenueTourBtn() {
-    // The homepage hero is an auto-rotating carousel; the first click after
-    // load occasionally lands right as it reflows and doesn't register as
-    // navigation (no Playwright error, it just silently stays on the
-    // homepage). Bounded retry against the destination page's own widget
-    // rather than a blind wait.
+  
     const calendarBtn = this.page.getByRole('button', { name: 'Open calendar' }).first();
 
     for (let attempt = 1; attempt <= 3; attempt++) {
