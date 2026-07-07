@@ -1,7 +1,4 @@
-// Recursive closures inside a declarative `script {}` block frequently get
-// rejected by Jenkins' CPS sandbox transformation (silently, if wrapped in a
-// try/catch) — @NonCPS runs this as plain, non-serialized Groovy instead,
-// which is the standard way to walk parsed JSON like this in a Jenkinsfile.
+
 @NonCPS
 def collectFailedTestTitles(suites) {
     def failedTests = []
@@ -21,7 +18,7 @@ pipeline {
         disableConcurrentBuilds()
     }
 
-    // Jenkins job checks this repo out to run the Jenkinsfile in the first place.
+   
     triggers {
         cron('0 */4 * * *')
     }
@@ -37,21 +34,15 @@ pipeline {
     stages {
         stage('Install Dependencies') {
             steps {
-                sh 'npm ci'
-                // --with-deps installs the OS-level libraries Chromium needs.
-                // Requires the Jenkins agent user to have permission to apt-install;
-                // drop --with-deps if the agent image already has them baked in.
-                sh 'npx playwright install --with-deps chromium'
+                sh 'npm install'
+               
+                sh 'npx playwright install chromium'
             }
         }
 
         stage('Authenticate (Emaar PASS)') {
             steps {
-                // Logs in once and saves the session to playwright/.auth/user.json,
-                // which bookingFlow.spec.js's Venue Tour test then loads via
-                // test.use({ storageState: ... }) — see tests/auth.setup.js.
-                // Credentials come from utils/constants.js (committed on purpose,
-                // shared QA account) — no Jenkins Credential needed for this.
+               
                 sh 'npx playwright test --project=setup'
             }
         }
@@ -59,10 +50,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh 'rm -rf test-results allure-results'
-                // --project=chromium excludes the "setup" project — otherwise
-                // Playwright re-runs auth.setup.js a second time here (it
-                // already ran in the Authenticate stage above) and it gets
-                // counted as one of the pass/fail totals in the report.
+                
                 sh 'npx playwright test --project=chromium'
             }
         }
@@ -70,8 +58,7 @@ pipeline {
 
     post {
         always {
-            // Attaches Playwright's own screenshots/traces to the build page so a
-            // failure email links to something more useful than raw console text.
+           
             archiveArtifacts artifacts: 'test-results/**', allowEmptyArchive: true
 
             // Requires the Allure Jenkins plugin. Drop this block if it isn't installed.
@@ -97,21 +84,13 @@ pipeline {
                         failed  = results.stats.unexpected.toString()
                         skipped = results.stats.skipped.toString()
 
-                        // Suite nesting depth varies: a bare test() (like
-                        // auth.setup.js) puts specs directly on the file-level
-                        // suite, while a test.describe() block (like
-                        // bookingFlow.spec.js) adds one more suite level —
-                        // collectFailedTestTitles() walks recursively instead
-                        // of assuming a fixed depth.
+                        
                         def failedTests = collectFailedTestTitles(results.suites)
 
                         if (failedTests.isEmpty()) {
                             failedTestsHtml = 'None'
                         } else {
-                            // Not withIndex()/collect() — those static methods
-                            // aren't in the Jenkins sandbox whitelist and throw
-                            // RejectedAccessException, which needs an admin to
-                            // approve. A plain indexed loop needs no approval.
+                           
                             def numbered = []
                             for (int i = 0; i < failedTests.size(); i++) {
                                 numbered.add("${i + 1}. ${failedTests[i]}")
